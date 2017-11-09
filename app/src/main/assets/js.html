@@ -1,0 +1,86 @@
+﻿<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <title>
+        js调用java
+    </title>
+</head>
+<body bgcolor="#ff6600"/>
+<body>
+
+<font color="#FFFFF">橘色的是html</font>
+<p>
+    <input type="button" id="enter" value="发ABC给android" onclick="testClick();"
+    />
+</p>
+<p>
+    <xmp id="show">
+    </xmp>
+</p>
+</body>
+<script>
+
+         function connectWebViewJavascriptBridge(callback) {
+            if (window.WebViewJavascriptBridge) {
+                callback(WebViewJavascriptBridge)
+            } else {
+                document.addEventListener(
+                    'WebViewJavascriptBridgeReady'
+                    , function() {
+                        callback(WebViewJavascriptBridge)
+                    },
+                    false
+                );
+            }
+        }
+    // 第一连接时初始化bridage
+        connectWebViewJavascriptBridge(function(bridge) {
+            bridge.init(function(message, responseCallback) {
+                console.log('JS got a message', message);
+                var data = {
+                    'Javascript Responds': '测试中文!'
+                };
+                console.log('JS responding with', data);
+                responseCallback(data);
+            });
+<!--  -----------------------------中间代码为注册方法   监听android发来的消息----------------------------------------------------------------------------------   -->
+
+            // 注册一个"functionInJs",
+            bridge.registerHandler("functionInJs", function(data, responseCallback) {
+
+                document.getElementById("show").innerHTML = ("from android:=" + data);
+                var responseData = "Javascript Says  我要你的地址!";
+                // response层
+                responseCallback(responseData);
+            });
+        })
+
+        <!--  ---------------------------------------------------------------------------------------------------------------   -->
+
+        bridge.init(function(message, responseCallback) {
+        console.log('JS got a message', message);
+        var data = {
+            'Javascript Responds': 'Wee!'
+        };
+        console.log('JS responding with', data);
+        responseCallback(data);
+    });
+
+
+
+<!--  ---------------------------------------------------------------------------------------------------------------   -->
+      //js  直接发送代码给android端
+      function testClick() {
+         //发送消息给java本地代码
+          var data = {id: 1, content: "ABC"};
+          window.WebViewJavascriptBridge.send(data, function(responseData) {
+            }
+          );
+        }
+
+<!--  ---------------------------------------------------------------------------------------------------------------   -->
+
+
+
+</script>
+
+</html>
